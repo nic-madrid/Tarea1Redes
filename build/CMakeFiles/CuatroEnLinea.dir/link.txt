@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/CuatroEnLinea.dir/main.cpp.o -o CuatroEnLinea 
