@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /home/a12345/Desktop/DatosyRedes/Tarea1/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/CuatroEnLinea.dir/all
+all: CMakeFiles/Prueba1.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/CuatroEnLinea.dir/clean
+clean: CMakeFiles/Prueba1.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/CuatroEnLinea.dir
+# Target rules for target CMakeFiles/Prueba1.dir
 
 # All Build rule for target.
-CMakeFiles/CuatroEnLinea.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CuatroEnLinea.dir/build.make CMakeFiles/CuatroEnLinea.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CuatroEnLinea.dir/build.make CMakeFiles/CuatroEnLinea.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles --progress-num=1,2 "Built target CuatroEnLinea"
-.PHONY : CMakeFiles/CuatroEnLinea.dir/all
+CMakeFiles/Prueba1.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles --progress-num=1,2 "Built target Prueba1"
+.PHONY : CMakeFiles/Prueba1.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/CuatroEnLinea.dir/rule: cmake_check_build_system
+CMakeFiles/Prueba1.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/CuatroEnLinea.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Prueba1.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 0
-.PHONY : CMakeFiles/CuatroEnLinea.dir/rule
+.PHONY : CMakeFiles/Prueba1.dir/rule
 
 # Convenience name for target.
-CuatroEnLinea: CMakeFiles/CuatroEnLinea.dir/rule
-.PHONY : CuatroEnLinea
+Prueba1: CMakeFiles/Prueba1.dir/rule
+.PHONY : Prueba1
 
 # clean rule for target.
-CMakeFiles/CuatroEnLinea.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CuatroEnLinea.dir/build.make CMakeFiles/CuatroEnLinea.dir/clean
-.PHONY : CMakeFiles/CuatroEnLinea.dir/clean
+CMakeFiles/Prueba1.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/clean
+.PHONY : CMakeFiles/Prueba1.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
