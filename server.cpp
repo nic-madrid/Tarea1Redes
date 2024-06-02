@@ -1,11 +1,151 @@
 #include <arpa/inet.h>
-#include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
 #include <iostream>
 #include <sys/socket.h>
+#include <pthread.h>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
+
+const int ROWS = 6;
+const int COLS = 7;
+char board[ROWS][COLS];
+
+// Función para inicializar el tablero
+void initializeBoard(char board[ROWS][COLS]) {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            board[i][j] = '.';
+        }
+    }
+}
+
+// Función para imprimir el tablero
+void printBoard(char board[ROWS][COLS]) {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            cout << board[i][j] << ' ';
+        }
+        cout << endl;
+    }
+}
+
+// Función para actualizar el tablero
+void updateBoard(int col, char symbol, char board[ROWS][COLS]) {
+    for (int i = ROWS - 1; i >= 0; i--) {
+        if (board[i][col] == '.') {
+            board[i][col] = symbol;
+            break;
+        }
+    }
+}
+
+// Función para enviar el tablero al cliente
+void sendBoard(int socket, char board[ROWS][COLS]) {
+    char boardStr[ROWS * COLS + 1];
+    int index = 0;
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            boardStr[index++] = board[i][j];
+        }
+    }
+    boardStr[index] = '\0';
+    send(socket, boardStr, sizeof(boardStr), 0);
+}
+
+char checkWinner(char board[ROWS][COLS]) {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            if (board[i][j] == 'C' || board[i][j] == 'S') {
+                // Check row
+                if (j <= COLS - 4 && board[i][j] == board[i][j+1] && board[i][j] == board[i][j+2] && board[i][j] == board[i][j+3]) {
+                    cout << "check fila\n" << endl;
+                    return board[i][j];
+                }
+                // Check column
+                if (i <= ROWS - 4 && board[i][j] == board[i+1][j] && board[i][j] == board[i+2][j] && board[i][j] == board[i+3][j]) {
+                    cout << "check columna\n" << endl;
+                    return board[i][j];
+                }
+                // Check diagonal /
+                if (i <= ROWS - 4 && j <= COLS - 4 && board[i][j] == board[i+1][j+1] && board[i][j] == board[i+2][j+2] && board[i][j] == board[i+3][j+3]) {
+                    cout << "check diagonal 1\n" << endl;
+                    return board[i][j];
+                }
+                // Check diagonal 
+                if (i >= 3 && j <= COLS - 4 && board[i][j] == board[i-1][j+1] && board[i][j] == board[i-2][j+2] && board[i][j] == board[i-3][j+3]) {
+                    cout << "check diagonal 2\n" << endl;
+                    return board[i][j];
+                }
+            }
+        }
+    }
+    return '.';
+}
+
+void* clientHandler(void* arg) {
+    int socket_cliente = *((int*)arg);
+    delete (int*)arg;
+
+    char buffer[1024];
+    memset(buffer, '\0', sizeof(buffer));
+    int n_bytes = 0;
+
+    srand(time(0)); // Inicializar la semilla aleatoria
+
+    // Crear un tablero individual para este cliente
+    char board[ROWS][COLS];
+    initializeBoard(board);
+
+    // Enviar el tablero inicial al cliente
+    sendBoard(socket_cliente, board);
+
+    while (true) {
+        // Esperar el movimiento del cliente
+        if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0) {
+            buffer[n_bytes] = '\0';
+
+            if (buffer[0] == 'Q') {
+                cout << "Client disconnected\n";
+                close(socket_cliente);
+                break;
+            }
+
+            // Imprimir y actualizar el movimiento del cliente
+            int client_move = buffer[1] - '0';
+            cout << "Client move: " << client_move << endl;
+            updateBoard(client_move, 'C', board);
+            printBoard(board);
+
+            char winner = checkWinner(board);
+            if (winner == 'C') {
+                cout << "Client wins!\n";
+                break;
+            } else if (winner == 'S') {
+                cout << "Server wins!\n";
+                break;
+            }
+
+            // Generar movimiento aleatorio del servidor
+            int server_move = rand() % 7; // Suponiendo que hay 7 columnas posibles (0-6)
+            updateBoard(server_move, 'S', board);
+            printBoard(board);
+
+            // Enviar el tablero actualizado al cliente y el movimiento del servidor
+            sendBoard(socket_cliente, board);
+            char server_response[50];
+            send(socket_cliente, server_response, strlen(server_response), 0);
+        } else {
+            cout << "Error receiving data\n";
+            close(socket_cliente);
+            break;
+        }
+    }
+
+    pthread_exit(NULL);
+}
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -43,76 +183,26 @@ int main(int argc, char **argv) {
 
     socklen_t addr_size = sizeof(direccionCliente);
 
-    cout << "Waiting for players to connect ...\n";
+    cout << "Waiting for clients to connect ...\n";
 
-    int player_turn = 1; // Indica el turno del jugador (1 o 2)
-    int socket_player1, socket_player2;
-    char move_player1, move_player2;
-
-    // Esperar a que se conecte el primer jugador
-    socket_player1 = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size);
-    if (socket_player1 < 0) {
-        cout << "Error accepting player 1 connection\n";
-        exit(EXIT_FAILURE);
-    }
-    cout << "Player 1 connected\n";
-    char player_type = '1';
-    if (send(socket_player1, &player_type, 1, 0) != 1) {
-        cout << "Error sending player type to player 1\n";
-        close(socket_player1);
-        exit(EXIT_FAILURE);
-    }
-
-    // Esperar a que se conecte el segundo jugador
-    socket_player2 = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size);
-    if (socket_player2 < 0) {
-        cout << "Error accepting player 2 connection\n";
-        exit(EXIT_FAILURE);
-    }
-    cout << "Player 2 connected\n";
-    player_type = '2';
-    if (send(socket_player2, &player_type, 1, 0) != 1) {
-        cout << "Error sending player type to player 2\n";
-        close(socket_player2);
-        exit(EXIT_FAILURE);
-    }
-
-    // Iniciar el juego
     while (true) {
-        if (player_turn == 1) {
-            cout << "Waiting for player 1 move...\n";
-            if (recv(socket_player1, &move_player1, 1, 0) <= 0) {
-                cout << "Player 1 disconnected\n";
-                break;
-            }
-            cout << "Player 1 move: " << move_player1 << endl;
-            if (send(socket_player2, &move_player1, 1, 0) != 1) {
-                cout << "Error sending player 1 move to player 2\n";
-                close(socket_player2);
-                break;
-            }
-            player_turn = 2;
-        } else {
-            cout << "Waiting for player 2 move...\n";
-            if (recv(socket_player2, &move_player2, 1, 0) <= 0) {
-                cout << "Player 2 disconnected\n";
-                break;
-            }
-            cout << "Player 2 move: " << move_player2 << endl;
-            if (send(socket_player1, &move_player2, 1, 0) != 1) {
-                cout << "Error sending player 2 move to player 1\n";
-                close(socket_player1);
-                break;
-            }
-            player_turn = 1;
+        int socket_cliente = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size);
+        if (socket_cliente < 0) {
+            cout << "Error accepting client connection\n";
+            continue;
+        }
+
+        cout << "Client connected\n";
+
+        pthread_t thread_id;
+        int* new_sock = new int(socket_cliente);
+        if (pthread_create(&thread_id, NULL, clientHandler, (void*)new_sock) != 0) {
+            cout << "Failed to create thread\n";
+            delete new_sock;
         }
     }
 
-    close(socket_player1);
-    close(socket_player2);
     close(socket_server);
     return 0;
 }
-
-
 

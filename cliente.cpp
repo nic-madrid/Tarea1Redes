@@ -6,86 +6,125 @@
 
 using namespace std;
 
-int main(int argc, char **argv) {
-    if (argc < 3) {
-        cout << "Usage: " << argv[0] << " <server_ip> <port>" << endl;
-        exit(EXIT_FAILURE);
-    }
+const int ROWS = 6;
+const int COLS = 7;
+char board[ROWS][COLS];
 
-    const char* server_ip = argv[1];
-    int port = atoi(argv[2]);
-    int socket_cliente = 0;
-    struct sockaddr_in direccionServidor;
-
-    cout << "Creating socket ...\n";
-    if ((socket_cliente = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        cout << "Error creating socket\n";
-        exit(EXIT_FAILURE);
-    }
-
-    cout << "Configuring server address structure ...\n";
-    memset(&direccionServidor, 0, sizeof(direccionServidor));
-    direccionServidor.sin_family = AF_INET;
-    direccionServidor.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, server_ip, &direccionServidor.sin_addr) <= 0) {
-        cout << "Invalid address/ Address not supported\n";
-        exit(EXIT_FAILURE);
-    }
-
-    cout << "Connecting to the game server ...\n";
-    if (connect(socket_cliente, (struct sockaddr *)&direccionServidor, sizeof(direccionServidor)) < 0) {
-        cout << "Connection Failed\n";
-        exit(EXIT_FAILURE);
-    }
-
-    cout << "Connected to the game server\n";
-
-    // Recibir el tipo de jugador del servidor
-    char player_type;
-    recv(socket_cliente, &player_type, 1, 0);
-
-    if (player_type == '1') {
-        cout << "You are the first player\n";
-        // Bucle para mantener la conexión abierta
-        char input;
-        while (true) {
-            // Leer entrada del usuario
-            cout << "Enter your move (or 'Q' to quit): ";
-            cin >> input;
-
-            // Enviar movimiento al servidor
-            send(socket_cliente, &input, 1, 0);
-
-            // Si el usuario envía 'Q', cerrar la conexión y salir del bucle
-            if (input == 'Q') {
-                break;
-            }
+// Función para inicializar el tablero
+void initializeBoard()
+{
+    for (int i = 0; i < ROWS; i++)
+    {
+        for (int j = 0; j < COLS; j++)
+        {
+            board[i][j] = '.';
         }
-    } else if (player_type == '2') {
-        cout << "You are the second player\n";
-        // Bucle para mantener la conexión abierta
-        char input;
-        while (true) {
-            // Leer entrada del usuario
-            cout << "Enter your move (or 'Q' to quit): ";
-            cin >> input;
+    }
+}
 
-            // Enviar movimiento al servidor
-            send(socket_cliente, &input, 1, 0);
-
-            // Si el usuario envía 'Q', cerrar la conexión y salir del bucle
-            if (input == 'Q') {
-                break;
-            }
+// Función para imprimir el tablero
+void printBoard()
+{
+    cout << "  0 1 2 3 4 5 6" << endl;
+    for (int i = 0; i < ROWS; i++)
+    {
+        cout << i << " ";
+        for (int j = 0; j < COLS; j++)
+        {
+            cout << board[i][j] << ' ';
         }
-    } else {
-        cout << "Invalid player type received from server\n";
+        cout << endl;
+    }
+}
+
+// Función para actualizar el tablero con los datos recibidos del servidor
+void updateBoard(const char *boardStr)
+{
+    int index = 0;
+    for (int i = 0; i < ROWS; i++)
+    {
+        for (int j = 0; j < COLS; j++)
+        {
+            board[i][j] = boardStr[index++];
+        }
+    }
+}
+
+int main(int argc, char *argv[])
+{
+   int socket_cliente;
+if (argc != 3)
+{
+    cout << "Uso: " << argv[0] << " <IP del servidor> <puerto>" << endl;
+    return 1;
+}
+
+char *server_ip_char = argv[1];
+int server_port = atoi(argv[2]);
+struct sockaddr_in server_ip;
+socket_cliente = socket(AF_INET, SOCK_STREAM, 0);
+if (socket_cliente < 0)
+{
+    cout << "Error creating socket\n";
+    exit(EXIT_FAILURE);
+}
+
+server_ip.sin_family = AF_INET;
+server_ip.sin_port = htons(server_port);
+if (inet_pton(AF_INET, server_ip_char, &server_ip.sin_addr) <= 0)
+{
+    cout << "Invalid address/ Address not supported \n";
+    return -1;
+}
+
+if (connect(socket_cliente, (struct sockaddr *)&server_ip, sizeof(server_ip)) < 0)
+{
+    cout << "Error connecting to server\n";
+    close(socket_cliente);
+    exit(EXIT_FAILURE);
+}
+
+cout << "Connected to server\n" << endl;
+
+    char buffer[1024];
+    int n_bytes;
+
+    // Recibir el tablero inicial del servidor
+    if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0)
+    {
+        buffer[n_bytes] = '\0';
+        updateBoard(buffer);
+        printBoard();
+    }
+    else
+    {
+        cout << "Error receiving initial board from server\n";
+        close(socket_cliente);
+        exit(EXIT_FAILURE);
     }
 
+    while (true)
+    {
+        cout << "Enter column to play (0-6) or Q to quit: " << endl;
+        cin >> buffer[1];
+        if (buffer[1] == 'Q')
+        {
+            cout << "Terminando conexion\n" << endl;
+            buffer[0] = 'Q';
+            send(socket_cliente, buffer, 2, 0);
+            break;
+        }
+        buffer[0] = 'C';
+        buffer[2] = '\0';
+        send(socket_cliente, buffer, 3, 0);
+        // Recibir el tablero actualizado del servidor
+        if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0)
+        {
+            buffer[n_bytes] = '\0';
+            updateBoard(buffer);
+            printBoard();
+    }
+    }
     close(socket_cliente);
     return 0;
 }
-
-
-
