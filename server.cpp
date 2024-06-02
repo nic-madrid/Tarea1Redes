@@ -114,21 +114,21 @@ void* clientHandler(void* arg) {
             int client_move = buffer[1] - '0';
             cout << "Client move: " << client_move << endl;
             updateBoard(client_move, 'C', board);
-            printBoard(board);
+            // printBoard(board); // Comentado
 
             char winner = checkWinner(board);
             if (winner == 'C') {
-                send(socket_cliente, "Client wins!\n", 13, 0);
+                send(socket_cliente, " Client  wins!\n", 13, 0);
                 break;
             } else if (winner == 'S') {
-                send(socket_cliente, "Server wins!\n", 13, 0);
+                send(socket_cliente, " Server  wins!\n", 13, 0);
                 break;
             }
 
             // Generar movimiento aleatorio del servidor
             int server_move = rand() % 7; // Suponiendo que hay 7 columnas posibles (0-6)
             updateBoard(server_move, 'S', board);
-            printBoard(board);
+            // printBoard(board); // Comentado
 
             // Enviar el tablero actualizado al cliente y el movimiento del servidor
             sendBoard(socket_cliente, board);
