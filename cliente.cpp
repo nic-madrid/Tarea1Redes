@@ -84,8 +84,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    cout << "Connected to server\n"
-         << endl;
+    cout << "Connected to server\n" << endl;
 
     char buffer[1024];
     int n_bytes;
@@ -110,8 +109,7 @@ int main(int argc, char *argv[])
         cin >> buffer[1];
         if (buffer[1] == 'Q')
         {
-            cout << "Terminando conexion\n"
-                 << endl;
+            cout << "Terminando conexion\n" << endl;
             buffer[0] = 'Q';
             send(socket_cliente, buffer, 2, 0);
             break;
@@ -123,8 +121,13 @@ int main(int argc, char *argv[])
         if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0)
         {
             buffer[n_bytes] = '\0';
-            updateBoard(buffer);
-            printBoard();
+            if (buffer[0] == 'W') {
+                cout << buffer + 1 << endl;
+                break;
+            } else {
+                updateBoard(buffer);
+                printBoard();
+            }
         }
     }
     close(socket_cliente);
