@@ -1,3 +1,4 @@
-/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles/Prueba1.dir
+/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles/Servidor.dir
+/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles/Cliente.dir
 /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles/edit_cache.dir
 /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles/rebuild_cache.dir

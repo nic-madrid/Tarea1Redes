@@ -63,7 +63,8 @@ CMAKE_BINARY_DIR = /home/a12345/Desktop/DatosyRedes/Tarea1/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/Prueba1.dir/all
+all: CMakeFiles/Servidor.dir/all
+all: CMakeFiles/Cliente.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +72,61 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/Prueba1.dir/clean
+clean: CMakeFiles/Servidor.dir/clean
+clean: CMakeFiles/Cliente.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/Prueba1.dir
+# Target rules for target CMakeFiles/Servidor.dir
 
 # All Build rule for target.
-CMakeFiles/Prueba1.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles --progress-num=1,2 "Built target Prueba1"
-.PHONY : CMakeFiles/Prueba1.dir/all
+CMakeFiles/Servidor.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Servidor.dir/build.make CMakeFiles/Servidor.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Servidor.dir/build.make CMakeFiles/Servidor.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles --progress-num=3,4 "Built target Servidor"
+.PHONY : CMakeFiles/Servidor.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/Prueba1.dir/rule: cmake_check_build_system
+CMakeFiles/Servidor.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Prueba1.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Servidor.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 0
-.PHONY : CMakeFiles/Prueba1.dir/rule
+.PHONY : CMakeFiles/Servidor.dir/rule
 
 # Convenience name for target.
-Prueba1: CMakeFiles/Prueba1.dir/rule
-.PHONY : Prueba1
+Servidor: CMakeFiles/Servidor.dir/rule
+.PHONY : Servidor
 
 # clean rule for target.
-CMakeFiles/Prueba1.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Prueba1.dir/build.make CMakeFiles/Prueba1.dir/clean
-.PHONY : CMakeFiles/Prueba1.dir/clean
+CMakeFiles/Servidor.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Servidor.dir/build.make CMakeFiles/Servidor.dir/clean
+.PHONY : CMakeFiles/Servidor.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Cliente.dir
+
+# All Build rule for target.
+CMakeFiles/Cliente.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Cliente.dir/build.make CMakeFiles/Cliente.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Cliente.dir/build.make CMakeFiles/Cliente.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles --progress-num=1,2 "Built target Cliente"
+.PHONY : CMakeFiles/Cliente.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Cliente.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Cliente.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/a12345/Desktop/DatosyRedes/Tarea1/build/CMakeFiles 0
+.PHONY : CMakeFiles/Cliente.dir/rule
+
+# Convenience name for target.
+Cliente: CMakeFiles/Cliente.dir/rule
+.PHONY : Cliente
+
+# clean rule for target.
+CMakeFiles/Cliente.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Cliente.dir/build.make CMakeFiles/Cliente.dir/clean
+.PHONY : CMakeFiles/Cliente.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
