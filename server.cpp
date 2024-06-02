@@ -9,16 +9,16 @@
 
 using namespace std;
 
-const int ROWS = 6;
-const int COLS = 7;
-char board[ROWS][COLS];
+const int Fila = 6;
+const int Columnas = 7;
+char board[Fila][Columnas];
 
 // Función para inicializar el tablero
-void initializeBoard(char board[ROWS][COLS])
+void InicializarTablero(char board[Fila][Columnas])
 {
-    for (int i = 0; i < ROWS; i++)
+    for (int i = 0; i < Fila; i++)
     {
-        for (int j = 0; j < COLS; j++)
+        for (int j = 0; j < Columnas; j++)
         {
             board[i][j] = '.';
         }
@@ -26,11 +26,11 @@ void initializeBoard(char board[ROWS][COLS])
 }
 
 // Función para imprimir el tablero
-void printBoard(char board[ROWS][COLS])
+void ImprimirTablero(char board[Fila][Columnas])
 {
-    for (int i = 0; i < ROWS; i++)
+    for (int i = 0; i < Fila; i++)
     {
-        for (int j = 0; j < COLS; j++)
+        for (int j = 0; j < Columnas; j++)
         {
             cout << board[i][j] << ' ';
         }
@@ -39,9 +39,9 @@ void printBoard(char board[ROWS][COLS])
 }
 
 // Función para actualizar el tablero
-void updateBoard(int col, char symbol, char board[ROWS][COLS])
+void ActualizarTablero(int col, char symbol, char board[Fila][Columnas])
 {
-    for (int i = ROWS - 1; i >= 0; i--)
+    for (int i = Fila - 1; i >= 0; i--)
     {
         if (board[i][col] == '.')
         {
@@ -52,13 +52,13 @@ void updateBoard(int col, char symbol, char board[ROWS][COLS])
 }
 
 // Función para enviar el tablero al cliente
-void sendBoard(int socket, char board[ROWS][COLS])
+void EnviarTablero(int socket, char board[Fila][Columnas])
 {
-    char boardStr[ROWS * COLS + 1];
+    char boardStr[Fila * Columnas + 1];
     int index = 0;
-    for (int i = 0; i < ROWS; i++)
+    for (int i = 0; i < Fila; i++)
     {
-        for (int j = 0; j < COLS; j++)
+        for (int j = 0; j < Columnas; j++)
         {
             boardStr[index++] = board[i][j];
         }
@@ -67,31 +67,31 @@ void sendBoard(int socket, char board[ROWS][COLS])
     send(socket, boardStr, sizeof(boardStr), 0);
 }
 
-char checkWinner(char board[ROWS][COLS])
+char RevisarGanador(char board[Fila][Columnas])
 {
-    for (int i = 0; i < ROWS; i++)
+    for (int i = 0; i < Fila; i++)
     {
-        for (int j = 0; j < COLS; j++)
+        for (int j = 0; j < Columnas; j++)
         {
             if (board[i][j] == 'C' || board[i][j] == 'S')
             {
                 // Check row
-                if (j <= COLS - 4 && board[i][j] == board[i][j + 1] && board[i][j] == board[i][j + 2] && board[i][j] == board[i][j + 3])
+                if (j <= Columnas - 4 && board[i][j] == board[i][j + 1] && board[i][j] == board[i][j + 2] && board[i][j] == board[i][j + 3])
                 {
                     return board[i][j];
                 }
                 // Check column
-                if (i <= ROWS - 4 && board[i][j] == board[i + 1][j] && board[i][j] == board[i + 2][j] && board[i][j] == board[i + 3][j])
+                if (i <= Fila - 4 && board[i][j] == board[i + 1][j] && board[i][j] == board[i + 2][j] && board[i][j] == board[i + 3][j])
                 {
                     return board[i][j];
                 }
                 // Check diagonal /
-                if (i <= ROWS - 4 && j <= COLS - 4 && board[i][j] == board[i + 1][j + 1] && board[i][j] == board[i + 2][j + 2] && board[i][j] == board[i + 3][j + 3])
+                if (i <= Fila - 4 && j <= Columnas - 4 && board[i][j] == board[i + 1][j + 1] && board[i][j] == board[i + 2][j + 2] && board[i][j] == board[i + 3][j + 3])
                 {
                     return board[i][j];
                 }
                 // Check diagonal
-                if (i >= 3 && j <= COLS - 4 && board[i][j] == board[i - 1][j + 1] && board[i][j] == board[i - 2][j + 2] && board[i][j] == board[i - 3][j + 3])
+                if (i >= 3 && j <= Columnas - 4 && board[i][j] == board[i - 1][j + 1] && board[i][j] == board[i - 2][j + 2] && board[i][j] == board[i - 3][j + 3])
                 {
                     return board[i][j];
                 }
@@ -101,7 +101,7 @@ char checkWinner(char board[ROWS][COLS])
     return '.';
 }
 
-void *clientHandler(void *arg)
+void *ManejoCliente(void *arg)
 {
     int socket_cliente = *((int *)arg);
     delete (int *)arg;
@@ -113,11 +113,11 @@ void *clientHandler(void *arg)
     srand(time(0)); // Inicializar la semilla aleatoria
 
     // Crear un tablero individual para este cliente
-    char board[ROWS][COLS];
-    initializeBoard(board);
+    char board[Fila][Columnas];
+    InicializarTablero(board);
 
     // Enviar el tablero inicial al cliente
-    sendBoard(socket_cliente, board);
+    EnviarTablero(socket_cliente, board);
 
     while (true)
     {
@@ -134,19 +134,19 @@ void *clientHandler(void *arg)
             }
 
             // Imprimir y actualizar el movimiento del cliente
-            int client_move = buffer[1] - '0';
-            cout << "Client move: " << client_move << endl;
-            updateBoard(client_move, 'C', board);
-            // printBoard(board); // Comentado
+            int MovCliente = buffer[1] - '0';
+            cout << "Client move: " << MovCliente << endl;
+            ActualizarTablero(MovCliente, 'C', board);
+            // ImprimirTablero(board); // Comentado
 
-            char winner = checkWinner(board);
-            if (winner == 'C')
+            char Ganador = RevisarGanador(board);
+            if (Ganador == 'C')
             {
                 send(socket_cliente, "WClient wins!\n", 14, 0);
                 cout << "Client wins!\n";
                 break;
             }
-            else if (winner == 'S')
+            else if (Ganador == 'S')
             {
                 send(socket_cliente, "WServer wins!\n", 14, 0);
                 cout << "Server wins!\n";
@@ -154,12 +154,12 @@ void *clientHandler(void *arg)
             }
 
             // Generar movimiento aleatorio del servidor
-            int server_move = rand() % 7; // Suponiendo que hay 7 columnas posibles (0-6)
-            updateBoard(server_move, 'S', board);
-            // printBoard(board); // Comentado
+            int MovServer = rand() % 7; // Suponiendo que hay 7 columnas posibles (0-6)
+            ActualizarTablero(MovServer, 'S', board);
+            // ImprimirTablero(board); // Comentado
 
             // Enviar el tablero actualizado al cliente y el movimiento del servidor
-            sendBoard(socket_cliente, board);
+            EnviarTablero(socket_cliente, board);
             char server_response[50];
             send(socket_cliente, server_response, strlen(server_response), 0);
         }
@@ -213,13 +213,13 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    socklen_t addr_size = sizeof(direccionCliente);
+    socklen_t TamanoDireccion = sizeof(direccionCliente);
 
     cout << "Waiting for clients to connect ...\n";
 
     while (true)
     {
-        int socket_cliente = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size);
+        int socket_cliente = accept(socket_server, (struct sockaddr *)&direccionCliente, &TamanoDireccion);
         if (socket_cliente < 0)
         {
             cout << "Error accepting client connection\n";
@@ -229,11 +229,11 @@ int main(int argc, char **argv)
         cout << "Client connected\n";
 
         pthread_t thread_id;
-        int *new_sock = new int(socket_cliente);
-        if (pthread_create(&thread_id, NULL, clientHandler, (void *)new_sock) != 0)
+        int *nuevo_socket = new int(socket_cliente);
+        if (pthread_create(&thread_id, NULL, ManejoCliente, (void *)nuevo_socket) != 0)
         {
             cout << "Failed to create thread\n";
-            delete new_sock;
+            delete nuevo_socket;
         }
     }
 

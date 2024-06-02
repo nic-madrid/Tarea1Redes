@@ -8,22 +8,22 @@ using namespace std;
 
 const int ROWS = 6;
 const int COLS = 7;
-char board[ROWS][COLS];
+char Tablero[ROWS][COLS];
 
 // Función para inicializar el tablero
-void initializeBoard()
+void InicializarTablero()
 {
     for (int i = 0; i < ROWS; i++)
     {
         for (int j = 0; j < COLS; j++)
         {
-            board[i][j] = '.';
+            Tablero[i][j] = '.';
         }
     }
 }
 
 // Función para imprimir el tablero
-void printBoard()
+void ImprimirTablero()
 {
     cout << "  0 1 2 3 4 5 6" << endl;
     for (int i = 0; i < ROWS; i++)
@@ -31,21 +31,21 @@ void printBoard()
         cout << i << " ";
         for (int j = 0; j < COLS; j++)
         {
-            cout << board[i][j] << ' ';
+            cout << Tablero[i][j] << ' ';
         }
         cout << endl;
     }
 }
 
 // Función para actualizar el tablero con los datos recibidos del servidor
-void updateBoard(const char *boardStr)
+void ActualizarTablero(const char *TableroStr)
 {
-    int index = 0;
+    int indice = 0;
     for (int i = 0; i < ROWS; i++)
     {
         for (int j = 0; j < COLS; j++)
         {
-            board[i][j] = boardStr[index++];
+            Tablero[i][j] = TableroStr[indice++];
         }
     }
 }
@@ -93,12 +93,12 @@ int main(int argc, char *argv[])
     if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0)
     {
         buffer[n_bytes] = '\0';
-        updateBoard(buffer);
-        printBoard();
+        ActualizarTablero(buffer);
+        ImprimirTablero();
     }
     else
     {
-        cout << "Error receiving initial board from server\n";
+        cout << "Error receiving initial Tablero from server\n";
         close(socket_cliente);
         exit(EXIT_FAILURE);
     }
@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
                 cout << buffer + 1 << endl;
                 break;
             } else {
-                updateBoard(buffer);
-                printBoard();
+                ActualizarTablero(buffer);
+                ImprimirTablero();
             }
         }
     }
