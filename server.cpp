@@ -38,7 +38,7 @@ void ImprimirTablero(char board[Fila][Columnas])
     }
 }
 
-// Función para actualizar el tablero
+// Función para actualizar el tablero con los datos recibidos del cliente
 void ActualizarTablero(int col, char symbol, char board[Fila][Columnas])
 {
     for (int i = Fila - 1; i >= 0; i--)
@@ -67,6 +67,7 @@ void EnviarTablero(int socket, char board[Fila][Columnas])
     send(socket, boardStr, sizeof(boardStr), 0);
 }
 
+// Función para revisar si hay un ganador en base a si existen 4 fichas iguales en línea horizontal, vertical o diagonal
 char RevisarGanador(char board[Fila][Columnas])
 {
     for (int i = 0; i < Fila; i++)
@@ -75,22 +76,18 @@ char RevisarGanador(char board[Fila][Columnas])
         {
             if (board[i][j] == 'C' || board[i][j] == 'S')
             {
-                // Check row
                 if (j <= Columnas - 4 && board[i][j] == board[i][j + 1] && board[i][j] == board[i][j + 2] && board[i][j] == board[i][j + 3])
                 {
                     return board[i][j];
                 }
-                // Check column
                 if (i <= Fila - 4 && board[i][j] == board[i + 1][j] && board[i][j] == board[i + 2][j] && board[i][j] == board[i + 3][j])
                 {
                     return board[i][j];
                 }
-                // Check diagonal /
                 if (i <= Fila - 4 && j <= Columnas - 4 && board[i][j] == board[i + 1][j + 1] && board[i][j] == board[i + 2][j + 2] && board[i][j] == board[i + 3][j + 3])
                 {
                     return board[i][j];
                 }
-                // Check diagonal
                 if (i >= 3 && j <= Columnas - 4 && board[i][j] == board[i - 1][j + 1] && board[i][j] == board[i - 2][j + 2] && board[i][j] == board[i - 3][j + 3])
                 {
                     return board[i][j];
@@ -101,6 +98,7 @@ char RevisarGanador(char board[Fila][Columnas])
     return '.';
 }
 
+// Función para manejar la conexión con el cliente
 void *ManejoCliente(void *arg)
 {
     int socket_cliente = *((int *)arg);
@@ -110,35 +108,45 @@ void *ManejoCliente(void *arg)
     memset(buffer, '\0', sizeof(buffer));
     int n_bytes = 0;
 
-    srand(time(0)); // Inicializar la semilla aleatoria
+    srand(time(0));
 
-    // Crear un tablero individual para este cliente
     char board[Fila][Columnas];
     InicializarTablero(board);
 
-    // Enviar el tablero inicial al cliente
     EnviarTablero(socket_cliente, board);
-
+    bool turnoCliente = rand() % 2 == 0;
     while (true)
     {
-        // Esperar el movimiento del cliente
+        // Si es el turno del cliente, se le notifica y se espera su movimiento
+        if (turnoCliente)
+        {
+            send(socket_cliente, "Tu turno\n", 10, 0);
+        }
+        else
+        {
+            int MovServer = rand() % 7;
+            ActualizarTablero(MovServer, 'S', board);
+
+            EnviarTablero(socket_cliente, board);
+            char server_response[50];
+            send(socket_cliente, server_response, strlen(server_response), 0);
+        }
         if ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0)
         {
             buffer[n_bytes] = '\0';
 
             if (buffer[0] == 'Q')
             {
-                cout << "Client disconnected\n";
+                cout << "Cliente desconectado\n";
                 close(socket_cliente);
                 break;
             }
 
-            // Imprimir y actualizar el movimiento del cliente
             int MovCliente = buffer[1] - '0';
             cout << "Client move: " << MovCliente << endl;
             ActualizarTablero(MovCliente, 'C', board);
-            // ImprimirTablero(board); // Comentado
 
+            // Se revisa si hay un ganador
             char Ganador = RevisarGanador(board);
             if (Ganador == 'C')
             {
@@ -152,13 +160,10 @@ void *ManejoCliente(void *arg)
                 cout << "Server wins!\n";
                 break;
             }
-
-            // Generar movimiento aleatorio del servidor
-            int MovServer = rand() % 7; // Suponiendo que hay 7 columnas posibles (0-6)
+            // El servidor juega su turno
+            int MovServer = rand() % 7;
             ActualizarTablero(MovServer, 'S', board);
-            // ImprimirTablero(board); // Comentado
 
-            // Enviar el tablero actualizado al cliente y el movimiento del servidor
             EnviarTablero(socket_cliente, board);
             char server_response[50];
             send(socket_cliente, server_response, strlen(server_response), 0);
@@ -215,7 +220,7 @@ int main(int argc, char **argv)
 
     socklen_t TamanoDireccion = sizeof(direccionCliente);
 
-    cout << "Waiting for clients to connect ...\n";
+    cout << "Esperando por jugadores ...\n";
 
     while (true)
     {
@@ -226,7 +231,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        cout << "Client connected\n";
+        cout << "Cliente conectado\n";
 
         pthread_t thread_id;
         int *nuevo_socket = new int(socket_cliente);

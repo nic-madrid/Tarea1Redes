@@ -50,8 +50,17 @@ void ActualizarTablero(const char *TableroStr)
     }
 }
 
+// Función para validar la entrada del usuario
+bool ValidarEntrada(const char *entrada)
+{
+    if (entrada[0] == 'Q') return true;
+    if (entrada[0] >= '0' || entrada[0] <= '6') return true;
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
+    // Crear el socket del cliente
     int socket_cliente;
     if (argc != 3)
     {
@@ -73,18 +82,18 @@ int main(int argc, char *argv[])
     server_ip.sin_port = htons(server_port);
     if (inet_pton(AF_INET, server_ip_char, &server_ip.sin_addr) <= 0)
     {
-        cout << "Invalid address/ Address not supported \n";
+        cout << "Direccion incorrecta\n";
         return -1;
     }
 
     if (connect(socket_cliente, (struct sockaddr *)&server_ip, sizeof(server_ip)) < 0)
     {
-        cout << "Error connecting to server\n";
+        cout << "Error conectando con el servidor\n";
         close(socket_cliente);
         exit(EXIT_FAILURE);
     }
 
-    cout << "Connected to server\n" << endl;
+    cout << "Conectado con el servidor\n" << endl;
 
     char buffer[1024];
     int n_bytes;
@@ -98,15 +107,20 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "Error receiving initial Tablero from server\n";
+        cout << "Error recibiendo Tablero inicial del server\n";
         close(socket_cliente);
         exit(EXIT_FAILURE);
     }
 
     while (true)
     {
-        cout << "Enter column to play (0-6) or Q to quit: " << endl;
+        cout << "Ingrese la columna a jugar (0-6) o Q para salir: " << endl;
         cin >> buffer[1];
+        if (!ValidarEntrada(buffer))
+        {
+            cout << "Entrada incorrecta, por favor utilice numeros del 0 al 6, o Q para salir." << endl;
+            continue;
+        }
         if (buffer[1] == 'Q')
         {
             cout << "Terminando conexion\n" << endl;
