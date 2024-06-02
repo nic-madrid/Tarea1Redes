@@ -52,39 +52,40 @@ void updateBoard(const char *boardStr)
 
 int main(int argc, char *argv[])
 {
-   int socket_cliente;
-if (argc != 3)
-{
-    cout << "Uso: " << argv[0] << " <IP del servidor> <puerto>" << endl;
-    return 1;
-}
+    int socket_cliente;
+    if (argc != 3)
+    {
+        cout << "Uso: " << argv[0] << " <IP del servidor> <puerto>" << endl;
+        return 1;
+    }
 
-char *server_ip_char = argv[1];
-int server_port = atoi(argv[2]);
-struct sockaddr_in server_ip;
-socket_cliente = socket(AF_INET, SOCK_STREAM, 0);
-if (socket_cliente < 0)
-{
-    cout << "Error creating socket\n";
-    exit(EXIT_FAILURE);
-}
+    char *server_ip_char = argv[1];
+    int server_port = atoi(argv[2]);
+    struct sockaddr_in server_ip;
+    socket_cliente = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_cliente < 0)
+    {
+        cout << "Error creating socket\n";
+        exit(EXIT_FAILURE);
+    }
 
-server_ip.sin_family = AF_INET;
-server_ip.sin_port = htons(server_port);
-if (inet_pton(AF_INET, server_ip_char, &server_ip.sin_addr) <= 0)
-{
-    cout << "Invalid address/ Address not supported \n";
-    return -1;
-}
+    server_ip.sin_family = AF_INET;
+    server_ip.sin_port = htons(server_port);
+    if (inet_pton(AF_INET, server_ip_char, &server_ip.sin_addr) <= 0)
+    {
+        cout << "Invalid address/ Address not supported \n";
+        return -1;
+    }
 
-if (connect(socket_cliente, (struct sockaddr *)&server_ip, sizeof(server_ip)) < 0)
-{
-    cout << "Error connecting to server\n";
-    close(socket_cliente);
-    exit(EXIT_FAILURE);
-}
+    if (connect(socket_cliente, (struct sockaddr *)&server_ip, sizeof(server_ip)) < 0)
+    {
+        cout << "Error connecting to server\n";
+        close(socket_cliente);
+        exit(EXIT_FAILURE);
+    }
 
-cout << "Connected to server\n" << endl;
+    cout << "Connected to server\n"
+         << endl;
 
     char buffer[1024];
     int n_bytes;
@@ -109,7 +110,8 @@ cout << "Connected to server\n" << endl;
         cin >> buffer[1];
         if (buffer[1] == 'Q')
         {
-            cout << "Terminando conexion\n" << endl;
+            cout << "Terminando conexion\n"
+                 << endl;
             buffer[0] = 'Q';
             send(socket_cliente, buffer, 2, 0);
             break;
@@ -123,7 +125,7 @@ cout << "Connected to server\n" << endl;
             buffer[n_bytes] = '\0';
             updateBoard(buffer);
             printBoard();
-    }
+        }
     }
     close(socket_cliente);
     return 0;

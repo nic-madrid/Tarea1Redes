@@ -61,22 +61,18 @@ char checkWinner(char board[ROWS][COLS]) {
             if (board[i][j] == 'C' || board[i][j] == 'S') {
                 // Check row
                 if (j <= COLS - 4 && board[i][j] == board[i][j+1] && board[i][j] == board[i][j+2] && board[i][j] == board[i][j+3]) {
-                    cout << "check fila\n" << endl;
                     return board[i][j];
                 }
                 // Check column
                 if (i <= ROWS - 4 && board[i][j] == board[i+1][j] && board[i][j] == board[i+2][j] && board[i][j] == board[i+3][j]) {
-                    cout << "check columna\n" << endl;
                     return board[i][j];
                 }
                 // Check diagonal /
                 if (i <= ROWS - 4 && j <= COLS - 4 && board[i][j] == board[i+1][j+1] && board[i][j] == board[i+2][j+2] && board[i][j] == board[i+3][j+3]) {
-                    cout << "check diagonal 1\n" << endl;
                     return board[i][j];
                 }
-                // Check diagonal 
+                // Check diagonal
                 if (i >= 3 && j <= COLS - 4 && board[i][j] == board[i-1][j+1] && board[i][j] == board[i-2][j+2] && board[i][j] == board[i-3][j+3]) {
-                    cout << "check diagonal 2\n" << endl;
                     return board[i][j];
                 }
             }
@@ -84,6 +80,7 @@ char checkWinner(char board[ROWS][COLS]) {
     }
     return '.';
 }
+
 
 void* clientHandler(void* arg) {
     int socket_cliente = *((int*)arg);
@@ -121,10 +118,10 @@ void* clientHandler(void* arg) {
 
             char winner = checkWinner(board);
             if (winner == 'C') {
-                cout << "Client wins!\n";
+                send(socket_cliente, "Client wins!\n", 13, 0);
                 break;
             } else if (winner == 'S') {
-                cout << "Server wins!\n";
+                send(socket_cliente, "Server wins!\n", 13, 0);
                 break;
             }
 
@@ -205,4 +202,3 @@ int main(int argc, char **argv) {
     close(socket_server);
     return 0;
 }
-
